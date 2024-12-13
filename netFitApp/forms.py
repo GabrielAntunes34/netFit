@@ -3,14 +3,14 @@ from django.forms.models import inlineformset_factory
 from .models import Treino, Serie
 
 # Formulário usado para um cliente criar um novo treino
-class formTreino(forms.modelForm):
+class formTreino(forms.ModelForm):
     class Meta:
         model = Treino
-        fields = ['Nome', 'Gasto calórico']
+        fields = ['nome', 'gastoCalorico']
 
         widgets = {
-            'Nome': forms.TextInput(attrs={'class': 'form-control'}),
-            'Gasto calórico': forms.TextInput(attrs={'class': 'form-control'}),
+            'nome': forms.TextInput(attrs={'class': 'form-control'}),
+            'gastoCalorico': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 # inLineFormSet para associar uma lista de séries ao formulário de treino
