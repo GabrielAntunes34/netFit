@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <div>
+        {% if msg_erro %}
+            {{msg_erro}}
+        {% endif %}
+    </div>
+
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <label for="nomeCompleto">Username: </label>
+        <input type="text" name="username">
+        <label for="senha">Senha: </label>
+        <input type="password" name="senha">
+        <input type="submit" value="Login">
+    </form>
+    Não tem conta? <a href="{% url 'register' %}">Cadastre-se</a>
+
+</body>
+</html>
