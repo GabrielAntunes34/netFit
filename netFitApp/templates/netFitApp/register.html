@@ -4,10 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro</title>
+    <style>
+        /* Inicialmente, os campos extras estão ocultos */
+        #campos-entusiasta, #campos-personal {
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    <div>
+        {% if msg_erro %}
+            <p style="color: red;">{{msg_erro}}</p>
+        {% endif %}
+    </div>
+
     <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
         
+        <label for="username">Username:</label>
+        <input type="text" name="username"> <br>
+
+        <label for="cpf">CPF:</label>
+        <input type="text" name="cpf"> <br>
+
+        <label for="data">Data de nascimento:</label>
+        <input type="date" name="data"> <br>
+
+        <label for="senha">Senha:</label>
+        <input type="password" name="senha"> <br>
+
+        <label for="conf_senha">Confirmação de Senha:</label>
+        <input type="password" name="conf_senha"> <br>
+
+        <!-- Seleção do tipo de usuário -->
+        <label for="tipo_usuario">Tipo de Usuário:</label>
+        <select name="tipo_usuario" id="tipo_usuario">
+            <option value="">--Selecione--</option>
+            <option value="entusiasta">Entusiasta</option>
+            <option value="personal">Personal</option>
+        </select> <br>
+
+        <!-- Campos adicionais para Entusiasta -->
+        <div id="campos-entusiasta">
+            <label for="percentualDeGordura">Percentual de Gordura:</label>
+            <input type="number" name="percentualDeGordura" step="0.1"> <br>
+
+            <label for="peso">Peso:</label>
+            <input type="number" name="peso" step="0.1"> <br>
+            <label for="personal">Username do seu personal: </label>
+            <input type="text" name="personal"> <br>
+        </div>
+
+        <!-- Campos adicionais para Personal -->
+        <div id="campos-personal">
+            <label for="registroProfissional">Registro Profissional:</label>
+            <textarea name="registroProfissional"></textarea> <br>
+        </div>
+
+        <input type="submit" value="Cadastrar">
     </form>
+
+    <script>
+        // Seleciona os elementos do DOM
+        const tipoUsuario = document.getElementById('tipo_usuario');
+        const camposEntusiasta = document.getElementById('campos-entusiasta');
+        const camposPersonal = document.getElementById('campos-personal');
+
+        // Evento de mudança no tipo de usuário
+        tipoUsuario.addEventListener('change', function () {
+            const tipo = this.value;
+
+            // Exibe os campos de acordo com o tipo selecionado
+            if (tipo === 'entusiasta') {
+                camposEntusiasta.style.display = 'block';
+                camposPersonal.style.display = 'none';
+            } else if (tipo === 'personal') {
+                camposEntusiasta.style.display = 'none';
+                camposPersonal.style.display = 'block';
+            } else {
+                camposEntusiasta.style.display = 'none';
+                camposPersonal.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

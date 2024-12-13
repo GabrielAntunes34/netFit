@@ -10,7 +10,7 @@ class TreinoForm(forms.ModelForm):
 
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control'}),
-            'gastoCalórico': forms.TextInput(attrs={'class': 'form-control'}),
+            'gastoCalorico': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 # inLineFormSet para associar uma lista de séries ao formulário de treino
