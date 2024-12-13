@@ -97,14 +97,14 @@ def register(request):
 
 
 # Retorna a página que lista os treinos do usuário
-@login_required
+@login_required(login_url='/login')
 def listar_treinos(request):
-    treinos = Treino.objects.filter(usuario=request.user).prefetch_related('series__exercicio')
-    return render(request, 'listarTreinos.html', {'treinos':treinos})
+    treinos = Treino.objects.filter(entusiasta=request.user).prefetch_related('series__exercicio')
+    return render(request, 'netFitApp/listarTreinos.html', {'treinos':treinos})
 
 
 # Retorna a página enviar treino e lida com as requisições POST do seu formulário
-@login_required
+@login_required(login_url='/login')
 def montar_treino(request):
     if request.method == "POST":
         # Obtendo os dados de cada formulário da requisição
@@ -129,4 +129,4 @@ def montar_treino(request):
         # Se não, a requisição é um get, e apenas respondemos com a página com os formulários
         treino_form = TreinoForm()
         series_form = SerieInlineFormSet()
-    return render(request, 'criarTreino.html', {'treino_form':treino_form}, {'series_form':series_form})
+    return render(request, 'netFitApp/criarTreino.html', {'treino_form':treino_form}, {'series_form':series_form})
