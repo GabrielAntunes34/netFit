@@ -69,24 +69,23 @@ def register(request):
         # Diferencia entre Personal e Entusiasta
         if tipo == "personal":
             user.is_personal = True
-            user.save()
             Personal.objects.create(user=user, registroProfissional=request.POST['registroProfissional'])
+            user.save()
         elif tipo == "entusiasta":
             user.is_entusiasta = True
-            user.save()
             personal_username = request.POST['personal']
             try:
                 personal_user = Usuario.objects.get(username=personal_username, is_personal=True)
-                personal = personal_user.personal
             except (Usuario.DoesNotExist, AttributeError):
                 return render(request, "netFitApp/register.html", {
                     "msg_erro": "Personal inválido."
                 })
+            user.save()
             Entusiasta.objects.create(
                 user=user,
                 percentualDeGordura=request.POST['percentualDeGordura'],
                 peso=request.POST['peso'],
-                personal=personal
+                personal=Personal.objects.get(user=personal_user)
             )
 
         # Loga o usuário automaticamente após o registro
