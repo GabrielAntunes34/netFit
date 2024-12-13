@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetFit</title>
+</head>
+<body>
+    <h1>Criar Novo Treino</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Formulário do Treino -->
+        <fieldset>
+            <legend>Detalhes do Treino</legend>
+            {{ treino_form.as_p }}
+        </fieldset>
+
+        <!-- InlineFormSet para Séries -->
+        <fieldset>
+            <legend>Séries</legend>
+            {{ serie_formset.management_form }}
+            {% for form in serie_formset %}
+                {{ form.as_p }}
+            {% endfor %}
+        </fieldset>
+
+        <button type="submit">Salvar Treino</button>
+    </form>
+</body>
+</html>
