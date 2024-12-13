@@ -1,58 +1,33 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-# Modelo Abstrato Usuario
 class Usuario(AbstractUser):
-    cpf = models.CharField(max_length=20, null=True)
-    data_nascimento = models.DateField(blank=True, null=True)
+    cpf = models.CharField(max_length=20, null=True, blank=True)
+    data_nascimento = models.DateField(null=True, blank=True)
 
-    class Meta:
-        abstract = True  # Isso torna essa classe abstrata
+    # Adicionando campos para diferenciar os tipos de usuários
+    is_personal = models.BooleanField(default=False)
+    is_entusiasta = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
 
-# Subclasse Personal
-class Personal(Usuario):
+class Personal(models.Model):
+    user = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='personal', null=True)
     registroProfissional = models.TextField(null=True)
 
-    # Definindo related_name para evitar o conflito com o modelo User
-    groups = models.ManyToManyField(
-        'auth.Group', 
-        related_name='personals',  # Nome do relacionamento reverso
-        blank=True
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission', 
-        related_name='personals_permissions',  # Nome do relacionamento reverso
-        blank=True
-    )
-
     def __str__(self):
-        return f"Personal: {self.username}"
+        return f"Personal: {self.user.username}"
 
 
-# Subclasse Entusiasta
-class Entusiasta(Usuario):
+class Entusiasta(models.Model):
+    user = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='entusiasta', null=True)
     percentualDeGordura = models.FloatField(null=True)
     peso = models.FloatField(null=True)
-    personal = models.ForeignKey(Personal, on_delete=models.CASCADE, related_name='alunos', null=True)
-
-    # Definindo related_name para evitar o conflito com o modelo User
-    groups = models.ManyToManyField(
-        'auth.Group', 
-        related_name='entusiastas',  # Nome do relacionamento reverso
-        blank=True
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission', 
-        related_name='entusiastas_permissions',  # Nome do relacionamento reverso
-        blank=True
-    )
+    personal = models.ForeignKey(Personal, on_delete=models.SET_NULL, related_name='alunos', null=True)
 
     def __str__(self):
-        return f"Entusiasta: {self.username}"
-    
+        return f"Entusiasta: {self.user.username}"    
 
 class Exercicio(models.Model):
     id = models.AutoField(primary_key=True) # Id é a primary key gerada automaticamente pelo bnado
