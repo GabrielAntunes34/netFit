@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetFit</title>
+</head>
+<body>
+    <h1>Treinos ativos</h1>
+
+    <div class="listaDeTreinos">
+        {% for treino in treinos %}
+            <div class="card-treino">
+                <h2>{{treino.nome}} - {{treino.gastoCalorico}}</h2>
+                
+                {% for serie in treino.series.all %}
+                    <div class="card-serie">
+                        <h3>{{serie}} de {{serie.exercicio.nome}}</h3> 
+                    </div>
+                {% endfor %}
+
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
