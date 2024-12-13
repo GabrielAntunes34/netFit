@@ -38,15 +38,6 @@ class Exercicio(models.Model):
     def __str__(self):
         return self.nome
     
-class Treino(models.Model):
-    id = models.AutoField(primary_key=True)
-    nome = models.CharField(max_length=100)
-    gastoCalorico = models.FloatField()
-    entusiasta = models.ForeignKey(Entusiasta, on_delete=models.CASCADE, related_name='treinos')
-
-    def __str__(self):
-        return self.nome
-
 # Um exercício possui muitas séries
 # Um treino possui muitas séries
 class Serie(models.Model):
@@ -54,10 +45,20 @@ class Serie(models.Model):
     n_repeticoes = models.PositiveIntegerField()
     n_series = models.PositiveIntegerField()
     exercicio = models.ForeignKey(Exercicio, on_delete=models.CASCADE, related_name='series')
-    treino = models.ForeignKey(Treino, on_delete=models.CASCADE, related_name='series')
 
     def __str__(self):
         return f"{self.n_series} séries de {self.n_repeticoes}"
+    
+class Treino(models.Model):
+    id = models.AutoField(primary_key=True)
+    nome = models.CharField(max_length=100)
+    gastoCalorico = models.FloatField()
+    series = models.ManyToManyField(Serie, related_name='treinos')
+    entusiasta = models.ForeignKey(Entusiasta, on_delete=models.CASCADE, related_name='treinos')
+
+    def __str__(self):
+        return self.nome
+
     
     
 

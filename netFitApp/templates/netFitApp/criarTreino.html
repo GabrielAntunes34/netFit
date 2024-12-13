@@ -10,23 +10,19 @@
 
     <form method="post">
         {% csrf_token %}
-        
-        <!-- Formulário do Treino -->
-        <fieldset>
-            <legend>Detalhes do Treino</legend>
+        <div>
             {{ treino_form.as_p }}
-        </fieldset>
-
-        <!-- InlineFormSet para Séries -->
-        <fieldset>
-            <legend>Séries</legend>
-            {{ serie_formset.management_form }}
-            {% for form in serie_formset %}
-                {{ form.as_p }}
+        </div>
+        <h3>Selecione as séries:</h3>
+        <div>
+            {% for serie in series_disponiveis %}
+                <label>
+                    <input type="checkbox" name="series" value="{{ serie.id }}">
+                    {{ serie.exercicio.nome }}: {{ serie }}  
+                </label><br>
             {% endfor %}
-        </fieldset>
-
-        <button type="submit">Salvar Treino</button>
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar Treino</button>
     </form>
 </body>
 </html>

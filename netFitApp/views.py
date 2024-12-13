@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import TreinoForm, SerieInlineFormSet
+from .forms import TreinoForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -98,7 +98,7 @@ def register(request):
 # Retorna a página que lista os treinos do usuário
 @login_required(login_url='/login')
 def listar_treinos(request):
-    treinos = Treino.objects.filter(entusiasta=request.user).prefetch_related('series__exercicio')
+    treinos = Treino.objects.filter(entusiasta=Entusiasta.objects.get(user=request.user)).prefetch_related('series__exercicio')
     return render(request, 'netFitApp/listarTreinos.html', {'treinos':treinos})
 
 
@@ -108,24 +108,24 @@ def montar_treino(request):
     if request.method == "POST":
         # Obtendo os dados de cada formulário da requisição
         treino_form = TreinoForm(request.POST)
-        series_formset = SerieInlineFormSet(request.POST, instance=treino_form.instance)
 
         # Se a resposta é valida, Instanciamos o objeto
-        if treino_form.is_valid() and series_form.is_valid():
+        if treino_form.is_valid():
             # Salvando o novo objeto de Treino no banco
             treino = treino_form.save(commit=False)
-            treino.entusiasta = request.user
+            treino.entusiasta = Entusiasta.objects.get(user=request.user)
             treino.save()
 
-            # Salvando a associação da chave estrageira na tabela séries
-            series_formset.instance = treino
-            series_formset.save()
+            # Salvando as séries selecionadas na requisição
+            series_do_treino = request.POST.getlist('series') # Lista dos ids de séries a serem salvos como chave estrangeira
+            treino.series.set(series_do_treino)
+            treino.save()
 
-            return redirect('listar_treinos')
+            return redirect(reverse('listarTreinos'))
 
 
     else:
         # Se não, a requisição é um get, e apenas respondemos com a página com os formulários
         treino_form = TreinoForm()
-        series_form = SerieInlineFormSet()
-    return render(request, 'netFitApp/criarTreino.html', {'treino_form':treino_form}, {'series_form':series_form})
+        series_disponiveis = Serie.objects.all()
+    return render(request, 'netFitApp/criarTreino.html', {'treino_form':treino_form, 'series_disponiveis':series_disponiveis})

@@ -14,10 +14,10 @@ class TreinoForm(forms.ModelForm):
         }
 
 # inLineFormSet para associar uma lista de séries ao formulário de treino
-SerieInlineFormSet = inlineformset_factory(
-    Treino,  # Modelo pai
-    Serie,  # Modelo filho
-    fields=['n_repeticoes', 'n_series', 'exercicio'],
-    extra=3,  # Número de formulários vazios exibidos
-    can_delete=True  # Permite excluir séries
-)
+#SerieInlineFormSet = inlineformset_factory(
+#    Treino,  # Modelo pai
+#    Serie,  # Modelo filho
+#    fields=['n_repeticoes', 'n_series', 'exercicio'],
+#    extra=3,  # Número de formulários vazios exibidos
+#    can_delete=True  # Permite excluir séries
+#)
