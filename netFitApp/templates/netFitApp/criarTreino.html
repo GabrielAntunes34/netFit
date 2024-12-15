@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NetFit</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    <a href="{% url 'index' %}">Voltar</a>
     <h1>Criar Novo Treino</h1>
 
     <form method="post">
@@ -19,11 +25,46 @@
             {% endfor %}
         </select>
         {% endif %}
+
         <div>
-            {{ treino_form.as_p }}
+            {{treino_form.as_p}}
         </div>
+
+        {% for exercicio in exercicios %}
+        {{exercicio.nome}}
+        <button class="{{exercicio.nome}}" type ='button'>Adicionar</button>
+        <div class="hidden" id="{{exercicio.nome}}">
+            <input type="hidden" class="validade" name="{{exercicio.nome}}_valido" value="0">
+            <label for="{{exercicio.nome}}_serie">Num. series: </label>
+            <input min="1" value="4" type="number" name="{{exercicio.nome}}_serie">
+            <label for="{{exercicio.nome}}_repeticao">Num. repetições: </label>
+            <input min="1" value="12" type="number" name="{{exercicio.nome}}_repeticao">
+        </div>
+        <br>
+        {% endfor %}
         
-        <button type="submit" class="btn btn-primary">Salvar Treino</button>
+        <input type="submit" class="btn btn-primary" value="Salvar Treino">
     </form>
+
+    <script>
+        let buttons = document.querySelectorAll('button')
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                //button.preventDefault();
+                let div = document.getElementById(button.className)
+                let inputHidden = div.querySelector('input[type="hidden"]')
+                console.log(inputHidden)
+                if (div.classList.contains('hidden')) {
+                    button.textContent = "Remover";
+                    div.classList.remove('hidden');
+                    inputHidden.value = "1";
+                } else {
+                    button.textContent = "Adicionar";
+                    div.classList.add('hidden');
+                    inputHidden.value = "0";
+                }
+            });
+        });
+    </script>
 </body>
 </html>
