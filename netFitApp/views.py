@@ -10,11 +10,14 @@ from django.urls import reverse
 from .models import *
 
 # Retorna a página inicial do site
-@login_required(login_url='/login')
 def index(request):
     return render(request, "netFitApp/index.html", {
-        "mensagem": 'testando'
+        "user": request.user
     })
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("index"))
 
 def login_view(request):
     if request.method == "POST":
@@ -98,6 +101,9 @@ def register(request):
 # Retorna a página que lista os treinos do usuário
 @login_required(login_url='/login')
 def listar_treinos(request):
+    if request.user.is_personal:
+        return HttpResponseRedirect(reverse("index"))
+
     treinos = Treino.objects.filter(entusiasta=Entusiasta.objects.get(user=request.user)).prefetch_related('series__exercicio')
     return render(request, 'netFitApp/listarTreinos.html', {'treinos':treinos})
 
@@ -113,19 +119,47 @@ def montar_treino(request):
         if treino_form.is_valid():
             # Salvando o novo objeto de Treino no banco
             treino = treino_form.save(commit=False)
-            treino.entusiasta = Entusiasta.objects.get(user=request.user)
-            treino.save()
+
+            treino.entusiasta = None
+            if (request.user.is_personal):
+                alunos = Entusiasta.objects.filter(personal=Personal.objects.get(user=request.user))
+                for aluno in alunos:
+                    if (aluno.user.username == request.POST['aluno']):
+                        treino.entusiasta = aluno
+            else:
+                treino.entusiasta = Entusiasta.objects.get(user=request.user)
 
             # Salvando as séries selecionadas na requisição
-            series_do_treino = request.POST.getlist('series') # Lista dos ids de séries a serem salvos como chave estrangeira
-            treino.series.set(series_do_treino)
+            series = []
+
+            exercicios_nomes = [ex for ex in Exercicio.objects.filter()]
+            for ex in exercicios_nomes:
+                if (request.POST[f'{ex.nome}_valido'] == "0"):
+                    continue
+                    
+                num_series = request.POST[f'{ex.nome}_serie']
+                num_reps = request.POST[f'{ex.nome}_repeticao']
+
+                serie = Serie(n_series=num_series, n_repeticoes=num_reps, exercicio=ex)
+                serie.save()
+                series.append(serie)
+                
             treino.save()
-
-            return redirect(reverse('listarTreinos'))
-
-
+            treino.series.add(*series)
+            treino.save()
+            return HttpResponseRedirect(reverse("listarTreinos"))
+        
     else:
         # Se não, a requisição é um get, e apenas respondemos com a página com os formulários
         treino_form = TreinoForm()
-        series_disponiveis = Serie.objects.all()
-    return render(request, 'netFitApp/criarTreino.html', {'treino_form':treino_form, 'series_disponiveis':series_disponiveis})
+
+        alunos = None
+        if request.user.is_personal:
+            personal = Personal.objects.get(user=request.user)
+            try:
+                alunos = [a.user for a in Entusiasta.objects.filter(personal=personal)]
+            except:
+                pass
+
+        exercicios = Exercicio.objects.filter()
+        return render(request, 'netFitApp/criarTreino.html', {'treino_form':treino_form, 'alunos': alunos, 'exercicios': exercicios})

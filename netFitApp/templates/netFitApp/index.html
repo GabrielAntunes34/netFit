@@ -3,9 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Inicio</title>
 </head>
 <body>
-    ola
+    {% if user.is_authenticated %}
+        <h3>{{user.username}}</h3>
+        {% if user.is_personal %}
+        <h5>(Personal)</h5>
+        {% else %}
+        <h5>(Entusiasta)</h5>
+        {% endif %}
+
+        <a href="{% url 'criarTreino' %}">Criar Treino</a> <br>
+        
+        {% if not user.is_personal %}
+            <a href="{% url 'listarTreinos' %}">Listar Treinos</a> <br>
+        {% endif %}
+
+        <a href="{% url 'logout_view' %}">Log out</a>
+    {% else %}
+        <a href="{% url 'login' %}">Login</a> <br>
+    {% endif %}
 </body>
 </html>
