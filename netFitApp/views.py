@@ -98,6 +98,9 @@ def register(request):
 # Retorna a página que lista os treinos do usuário
 @login_required(login_url='/login')
 def listar_treinos(request):
+    if request.user.is_personal:
+        return HttpResponseRedirect(reverse("criarTreino"))
+
     treinos = Treino.objects.filter(entusiasta=Entusiasta.objects.get(user=request.user)).prefetch_related('series__exercicio')
     return render(request, 'netFitApp/listarTreinos.html', {'treinos':treinos})
 
@@ -113,7 +116,16 @@ def montar_treino(request):
         if treino_form.is_valid():
             # Salvando o novo objeto de Treino no banco
             treino = treino_form.save(commit=False)
-            treino.entusiasta = Entusiasta.objects.get(user=request.user)
+
+            treino.entusiasta = None
+            if (request.user.is_personal):
+                alunos = Entusiasta.objects.filter(personal=Personal.objects.get(user=request.user))
+                for aluno in alunos:
+                    if (aluno.user.username == request.POST['aluno']):
+                        treino.entusiasta = aluno
+            else:
+                treino.entusiasta = Entusiasta.objects.get(user=request.user)
+            
             treino.save()
 
             # Salvando as séries selecionadas na requisição
@@ -127,5 +139,12 @@ def montar_treino(request):
     else:
         # Se não, a requisição é um get, e apenas respondemos com a página com os formulários
         treino_form = TreinoForm()
-        series_disponiveis = Serie.objects.all()
-    return render(request, 'netFitApp/criarTreino.html', {'treino_form':treino_form, 'series_disponiveis':series_disponiveis})
+        alunos = None
+        if request.user.is_personal:
+            personal = Personal.objects.get(user=request.user)
+            try:
+                alunos = [a.user for a in Entusiasta.objects.filter(personal=personal)]
+            except:
+                pass
+
+        return render(request, 'netFitApp/criarTreino.html', {'treino_form':treino_form, 'alunos': alunos})

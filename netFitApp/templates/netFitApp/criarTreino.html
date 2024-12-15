@@ -10,18 +10,19 @@
 
     <form method="post">
         {% csrf_token %}
+
+        {% if alunos %}
+        <label for="aluno">Selecione seu aluno: </label>
+        <select name="aluno">
+            {% for aluno in alunos %}
+            <option value="{{aluno.username}}">{{aluno.username}}</option>
+            {% endfor %}
+        </select>
+        {% endif %}
         <div>
             {{ treino_form.as_p }}
         </div>
-        <h3>Selecione as séries:</h3>
-        <div>
-            {% for serie in series_disponiveis %}
-                <label>
-                    <input type="checkbox" name="series" value="{{ serie.id }}">
-                    {{ serie.exercicio.nome }}: {{ serie }}  
-                </label><br>
-            {% endfor %}
-        </div>
+        
         <button type="submit" class="btn btn-primary">Salvar Treino</button>
     </form>
 </body>
